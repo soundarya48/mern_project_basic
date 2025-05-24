@@ -1,9 +1,21 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-const todoSchema = mongoose.Schema({
-    todo: { type: String }
-})
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  password: {
+    type: String,
+    required: true
+  }
+});
 
-const todoModel = mongoose.model("todos", todoSchema);
+const User = mongoose.model('User', userSchema);
 
-export default todoModel;
+export default User;

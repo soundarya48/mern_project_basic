@@ -1,71 +1,93 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
 const Todo = () => {
-    const [todo, setTodo] = useState("");
-    const [db, setDb] = useState([])
-    function post() {
-        axios.post("http://localhost:5000/api/post", { todo })
-            .then(() => {
-                alert("data has been stored")
-                get();
-                setTodo("")
-            })
-            .catch((err) => {
-                console.error(err);
+    const [db, setDb] = useState([]);
+    const [name, setName] = useState("demo");
+    const [editId, setEditId] = useState(null);
 
+    // CREATE
+    const post = () => {
+        axios.post("http://localhost:5000/posts", { name })
+            .then(() => {
+                alert("Post created");
+                get();
+                setName("");
             })
-    }
-    function get() {
-        axios.get("http://localhost:3000/posts")
+            .catch(() => {
+                alert("Post creation failed");
+            });
+    };
+
+    // READ
+    const get = () => {
+        axios.get('http://localhost:5000/posts')
             .then((res) => {
-                setDb(res.data)
+                setDb(res.data);
             })
-            .catch((err) => {
-                console.error(err)
-            })
-    }
-    console.log(db);
+            .catch(() => {
+                alert("Data fetch failed");
+            });
+    };
 
-    function update(data, id) {
-        axios.put(`http://localhost:3000/posts/${id}`, { todo: data })
+    // UPDATE
+    const put = () => {
+        axios.put(`http://localhost:5000/posts/${editId}`, { name })
             .then(() => {
+                alert("Post updated");
+                get();
+                setName("");
+                setEditId(null);
+            })
+            .catch(() => {
+                alert("Update failed");
+            });
+    };
+
+    // DELETE
+    const deletePost = (id) => {
+        axios.delete(`http://localhost:5000/posts/${id}`)
+            .then(() => {
+                alert("Post deleted");
                 get();
             })
-            .catch((err) => {
-                console.error(err);
+            .catch(() => {
+                alert("Delete failed");
+            });
+    };
 
-            })
-    }
-
-    function del(id) {
-        axios.delete(`http://localhost:3000/posts/${id}`)
-            .then(() => {
-                get();
-            })
-            .catch((err) => {
-                console.error(err);
-            })
-
-    }
-
+    useEffect(() => {
+        get();
+    }, []);
 
     return (
         <div style={{ margin: '100px' }}>
-            <label htmlFor="todo">Todo</label>
-            <input type="text" value={todo} onChange={(e) => setTodo(e.target.value)} />
-            <button onClick={post}>Post</button>
-            <ul>
-                {
-                    db.map((it) => (
-                        <li key={it.id}>{it.todo}<button onClick={() => {
-                            const data = prompt("enter the data").trim();
-                            update(data, it.id)
-                        }}>up</button>            <button onClick={() => del(it.id)}>del</button>    </li>
-                    ))
-                }
-            </ul>
-        </div>
-    )
-}
+            <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter name"
+            />
+            <button onClick={editId ? put : post}>
+                {editId ? "Update" : "Post"}
+            </button>
 
-export default Todo
+            <h3>Todo List:</h3>
+            {db.map((item) => (
+                <div key={item._id} style={{ marginBottom: "10px" }}>
+                    {item.name}
+                    <button onClick={() => {
+                        setName(item.name);
+                        setEditId(item._id);
+                    }} style={{ marginLeft: '10px' }}>
+                        Edit
+                    </button>
+                    <button onClick={() => deletePost(item._id)} style={{ marginLeft: '10px' }}>
+                        Delete
+                    </button>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+export default Todo;

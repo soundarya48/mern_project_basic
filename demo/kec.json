@@ -1,5 +1,14 @@
 {
-  "posts": [],
+  "posts": [
+    {
+      "name": "anusri",
+      "id": "36bb"
+    },
+    {
+      "id": "2e32",
+      "name": "anu"
+    }
+  ],
   "comments": [],
   "profile": {
     "name": "typicode"
